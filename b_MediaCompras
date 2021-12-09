@@ -1,0 +1,95 @@
+/**
+* @description       : 
+* @author            : Ana Margarida
+* @group             : 
+* @last modified on  : 12-09-2021
+* @last modified by  : Ana Margarida
+**/
+global class b_MediaCompras implements Database.Batchable<String>, Database.Stateful , Schedulable {
+    
+    global void execute(SchedulableContext sc)
+    {
+        b_MediaCompras n = new b_MediaCompras();
+        database.executeBatch(n,1);
+        
+    }
+    
+    global Iterable<String> start(Database.BatchableContext bc)
+    {
+        
+        AggregateResult[] groupedResults = [SELECT Cliente__c,SUM(Contar__c)FROM Compras__c WHERE  Cliente__c != NULL  GROUP BY Cliente__c];
+       
+        List<String> idacct = new List<String>();
+        for (AggregateResult  lista: groupedResults)
+        {
+            idacct.add(lista.get('Cliente__c').toString());
+
+        }
+        return idacct;
+    }
+    
+    
+    global void execute(Database.BatchableContext bc, List<String> scope)
+    {
+        Account acc = new Account();
+        acc.Id= scope[0];
+
+        //tamanho calçado
+        AggregateResult[] grupocalcado = [SELECT Tamanho_Calcado__c,SUM(Contar__c) soma FROM Compras__c WHERE Tamanho_Calcado__c != NULL AND Cliente__c IN:scope Group By Tamanho_Calcado__c ORDER BY SUM(Contar__c) DESC];
+        if(!grupocalcado.isEmpty())
+        {
+            String preferencialtamanho =(String)grupocalcado[0].get('Tamanho_Calcado__c');
+            acc.Tamanho_Calcado_Preferencial__c = preferencialtamanho;
+
+        }
+        
+        //tamanho textil
+        
+            
+        AggregateResult[] grupotextil = [SELECT Tamanho_Textil__c,SUM(Contar__c) soma FROM Compras__c WHERE Tamanho_Textil__c != NULL AND Cliente__c IN:scope Group By Tamanho_Textil__c ORDER BY SUM(Contar__c) DESC];
+            
+        if(!grupotextil.isEmpty())
+        {
+            String preferencialtextil =(String)grupotextil[0].get('Tamanho_Textil__c');
+            acc.Tamanho_Textil_Preferencial__c = preferencialtextil;
+        }
+
+        
+        //loja
+        AggregateResult[] grupoloja = [SELECT Nome_Insignia__c,SUM(Contar__c) soma FROM Compras__c WHERE Nome_Insignia__c != NULL AND Cliente__c IN:scope Group By Nome_Insignia__c ORDER BY SUM(Contar__c) DESC];
+        if (!grupoloja.isEmpty()) 
+        {
+            String preferencialloja =(String)grupoloja[0].get('Nome_Insignia__c');
+            acc.Loja_Preferencial__c = preferencialloja;
+        }
+       
+
+
+        //Marca
+        
+        AggregateResult[] grupomarca = [SELECT 	Marca__c,SUM(Contar__c) soma FROM Compras__c WHERE 	Marca__c != NULL AND Cliente__c IN:scope Group By Marca__c ORDER BY SUM(Contar__c) DESC];
+        if (!grupomarca.isEmpty()) 
+        {
+            String preferencialmarca =(String)grupomarca[0].get('Marca__c');
+            acc.Marca_Preferencial__c = preferencialmarca;
+        }
+
+        //subfamilia
+       
+        AggregateResult[] gruposubfamilia = [SELECT Subfamilia__c,SUM(Contar__c) soma FROM Compras__c WHERE Subfamilia__c != NULL AND Cliente__c IN:scope Group By Subfamilia__c ORDER BY SUM(Contar__c) DESC];
+        if (!gruposubfamilia.isEmpty()) 
+        {
+            String preferencialsubfamilia =(String)gruposubfamilia[0].get('Subfamilia__c');
+            acc.Sub_familia_Preferencial__c = preferencialsubfamilia;
+        }
+
+        update acc;
+    }
+
+    global void finish(Database.BatchableContext bc) 
+    {   
+        
+        //empty
+    }
+    
+}  
