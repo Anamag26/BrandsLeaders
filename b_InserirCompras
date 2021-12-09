@@ -1,0 +1,101 @@
+/**
+ * @description       : 
+ * @author            : Ana Margarida
+ * @group             : 
+ * @last modified on  : 12-07-2021
+ * @last modified by  : Ana Margarida
+**/
+global class b_InserirCompras implements Database.Batchable<sObject>, Database.Stateful , Schedulable {
+    
+    global void execute(SchedulableContext SC){
+        b_InserirCompras n = new b_InserirCompras();
+        database.executeBatch(n);
+        
+    }
+    global Database.QueryLocator start(Database.BatchableContext BC)
+    {
+        return Database.getQueryLocator('SELECT ID,	AccountId,TotalAmount,Nome_Insignia__c,Data_do_Documento__c,(SELECT ID,Familia__c,Tamanho__c,Marca__c,Sub_Familia__c FROM OrderItems ) FROM Order WHERE Data_do_Documento__c = LAST_N_MONTHS:12');
+    }
+    
+    global void execute(Database.BatchableContext BC, List<Order> scope)
+    {
+        
+        List<Compras__c> l_compras = new List<Compras__c>();
+        
+        for(Order ord :scope){
+            
+            Compras__c comp = new Compras__c();
+            comp.Cliente__c = ord.AccountId;
+
+            if(ord.Nome_Insignia__c == 'BAE'){
+                
+                comp.Valor_Total_de_insignias__c  = ord.TotalAmount;
+                comp.Nome_Insignia__c = ord.Nome_Insignia__c;
+            }
+            
+
+               
+            if(ord.Nome_Insignia__c == 'FUXIA'){
+                
+                comp.Valor_Total_de_insignias__c  = ord.TotalAmount;
+                comp.Nome_Insignia__c = ord.Nome_Insignia__c;
+            }
+            
+           
+            if(ord.Nome_Insignia__c == 'VEIN'){
+                
+                comp.Valor_Total_de_insignias__c  = ord.TotalAmount;
+                comp.Nome_Insignia__c = ord.Nome_Insignia__c;
+            }
+            
+           
+        
+            comp.Tipo__c = 'Order';
+            comp.Data_do_Documento__c = ord.Data_do_Documento__c;
+           
+            
+            
+            l_compras.add(comp);
+
+            for(OrderItem orditm :ord.OrderItems){
+                
+                Compras__c cpr = new Compras__c();
+                cpr.Cliente__c = ord.AccountId;
+                
+                //Valor de compras
+                
+                if(orditm.Familia__c == 'Calçado'){
+                    cpr.Tamanho_Calcado__c = orditm.Tamanho__c;
+                }
+                if (orditm.Familia__c == 'Têxtil'){
+                    cpr.Tamanho_Textil__c = orditm.Tamanho__c;
+                }
+                cpr.Marca__c=orditm.Marca__c;
+                cpr.Subfamilia__c = orditm.Sub_Familia__c;
+                
+ 				cpr.Tipo__c = 'Order Items'; 
+                
+                cpr.Data_do_Documento__c = ord.Data_do_Documento__c;
+                
+                l_compras.add(cpr);
+            }
+            
+            
+        }
+        
+        
+        
+        
+        if(!l_compras.isempty()){
+            
+            insert l_compras;
+        }
+        
+      
+    }
+    
+    global void finish(Database.BatchableContext BC) 
+    {   
+        
+    }
+}
