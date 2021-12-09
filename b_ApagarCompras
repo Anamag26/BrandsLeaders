@@ -1,0 +1,28 @@
+/**
+ * @description       : 
+ * @author            : Ana Margarida
+ * @group             : 
+ * @last modified on  : 12-07-2021
+ * @last modified by  : Ana Margarida
+**/
+global class b_ApagarCompras implements Database.Batchable<sObject>, Database.Stateful , Schedulable {
+    
+    global void execute(SchedulableContext SC){
+        b_ApagarCompras n = new b_ApagarCompras();
+   		database.executeBatch(n,1);
+ 
+    }
+    global Database.QueryLocator start(Database.BatchableContext BC)
+    {
+        return Database.getQueryLocator('SELECT ID FROM Compras__c WHERE Data_do_Documento__c < LAST_N_MONTHS:12');
+    }
+
+    global void execute(Database.BatchableContext BC, List<Compras__c> scope)
+    {
+        delete scope;
+    }
+
+    global void finish(Database.BatchableContext BC) 
+    {        
+    }
+}
