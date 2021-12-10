@@ -1,0 +1,68 @@
+/**
+ * @description       : 
+ * @author            : Ana Margarida
+ * @group             : 
+ * @last modified on  : 12-10-2021
+ * @last modified by  : Ana Margarida
+**/
+@isTest
+private class test_mediapreferencias {
+   
+    @istest
+    static void makeData(){
+        Test.startTest();
+        Id recordTypeId = [SELECT Id FROM RecordType WHERE DeveloperName = 'PersonAccount' AND sObjectType = 'Account'].Id;
+        Account acc = new Account(LastName='Test Account', RecordTypeId = recordTypeId);
+       
+        insert acc;
+        System.debug(acc);
+        Compras__c compra1 = new Compras__c();
+        compra1.Name = 'test compra1';
+        compra1.Cliente__c = acc.Id;
+        compra1.Tamanho_Calcado__c = '38';
+        compra1.Tamanho_Textil__c = 's';
+        compra1.Nome_Insignia__c = 'BAE';
+        compra1.Marca__c = 'nike';
+        compra1.Subfamilia__c = 'sapatilhas';
+
+        Compras__c compra2 = new Compras__c();
+        compra2.Name = 'test compra2';
+        compra2.Cliente__c = acc.Id;
+        compra2.Tamanho_Calcado__c = '38';
+        compra2.Tamanho_Textil__c = 's';
+        compra2.Nome_Insignia__c = 'BAE';
+        compra2.Marca__c = 'nike';
+        compra2.Subfamilia__c = 'sapatilhas';
+
+        Compras__c compra3 = new Compras__c();
+        compra3.Name = 'test compra3';
+        compra3.Cliente__c = acc.Id;
+        compra3.Tamanho_Calcado__c = '36';
+        compra3.Tamanho_Textil__c = 'l';
+        compra3.Nome_Insignia__c = 'FUXIA';
+        compra3.Marca__c = 'adidas';
+        compra3.Subfamilia__c = 'tenis';
+
+        Compras__c compra4 = new Compras__c();
+        compra4.Name = 'test compra4';
+        compra4.Cliente__c = acc.Id;
+        compra4.Tamanho_Calcado__c = '38';
+        compra4.Tamanho_Textil__c = 's';
+        compra4.Nome_Insignia__c = 'BAE';
+        compra4.Marca__c = 'nike';
+        compra4.Subfamilia__c = 'sapatilhas';
+        
+        insert compra1;
+        insert compra2;
+        insert compra3;
+        insert compra4;
+
+        
+
+        b_MediaCompras n = new b_MediaCompras();
+        database.executeBatch(n,1);
+
+        Test.stopTest(); 
+    }
+
+}
