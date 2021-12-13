@@ -1,0 +1,125 @@
+/**
+ * @description       : 
+ * @author            : Ana Margarida
+ * @group             : 
+ * @last modified on  : 12-13-2021
+ * @last modified by  : Ana Margarida
+**/
+
+@isTest
+private class test_InserirCompras {
+   
+    @istest
+    static void makeData()
+    {
+        Test.startTest();
+      
+        Id recordTypeId = [SELECT Id FROM RecordType WHERE DeveloperName = 'PersonAccount' AND sObjectType = 'Account'].Id;
+        Account acc = new Account(LastName='Test Account', RecordTypeId = recordTypeId);
+       
+        insert acc;
+
+        Product2 prod1 = new Product2();
+        prod1.Name = 'Produto1';
+        prod1.Marca__c = 'nike';
+        prod1.Modelo__c = 'air';
+        prod1.Family ='Calçado';
+        prod1.ID_SAGE_Produto__c = '1234';
+        prod1.QuantityUnitOfMeasure = '3';
+        prod1.Preco_de_tabela__c = 67;
+
+        insert prod1;
+
+        Product2 prod2 = new Product2();
+        prod2.Name = 'Produto 2';
+        prod2.Marca__c = 'adidas';
+        prod2.Modelo__c = 'airs';
+        prod2.Family ='Têxtil';
+        prod2.ID_SAGE_Produto__c = '12344';
+        prod2.QuantityUnitOfMeasure = '6';
+        prod2.Preco_de_tabela__c = 56;
+        insert prod2;
+        
+        Pricebook2 book = new Pricebook2();
+        book.Name='nome';
+        insert book;
+
+        PricebookEntry bookentry1 = new PricebookEntry();
+        bookentry1.Product2Id = prod1.Id;
+        bookentry1.Pricebook2Id =Test.getStandardPricebookId();
+        bookentry1.UnitPrice = 0;
+        insert bookentry1;
+
+        PricebookEntry bookentry2 = new PricebookEntry();
+        bookentry2.Product2Id = prod2.Id;
+        bookentry2.Pricebook2Id =Test.getStandardPricebookId();
+        bookentry2.UnitPrice = 0;
+        insert bookentry2;
+        
+        Date today = date.today();
+        Order ord1= new Order();
+        ord1.Status = 'Encomendado';
+        ord1.AccountId = acc.Id;
+        ord1.Data_do_Documento__c = date.newInstance(today.year(), today.month()-12,10);
+        ord1.Codigo_Loja_Armazem__c = '7';
+        ord1.EffectiveDate = date.newInstance(today.year(), today.month(),10);
+        ord1.Pricebook2Id= bookentry1.Pricebook2Id;
+        insert ord1;
+
+        Order ord2= new Order();
+        ord2.Status = 'Encomendado';
+        ord2.AccountId = acc.Id;
+        ord2.Data_do_Documento__c = date.newInstance(today.year(), today.month()-12,10);
+        ord2.Codigo_Loja_Armazem__c = '12';
+        ord2.EffectiveDate = date.newInstance(today.year(), today.month(),10);
+        ord2.Pricebook2Id= bookentry2.Pricebook2Id;
+        insert ord2;
+
+        Order ord3= new Order();
+        ord3.Status = 'Encomendado';
+        ord3.AccountId = acc.Id;
+        ord3.Data_do_Documento__c = date.newInstance(today.year(), today.month()-12,10);
+        ord3.Codigo_Loja_Armazem__c = '19';
+        ord3.EffectiveDate = date.newInstance(today.year(), today.month(),10);
+        ord3.Pricebook2Id= bookentry2.Pricebook2Id;
+       
+        insert ord3;
+       
+       
+        
+        OrderItem orditm1 = new OrderItem();
+        orditm1.OrderId= ord1.Id;
+        orditm1.Product2Id = prod1.Id;
+        orditm1.PricebookEntryId =bookentry1.id;
+        orditm1.UnitPrice = 0;
+        orditm1.Quantity = 3;
+        orditm1.Tamanho__c= '34';
+        insert orditm1;
+
+        OrderItem orditm2 = new OrderItem();
+        orditm2.OrderId= ord2.Id;
+        orditm2.Product2Id = prod2.Id;
+        orditm2.PricebookEntryId =bookentry2.id;
+        orditm2.UnitPrice = 0;
+        orditm2.Quantity = 3;
+        orditm2.Tamanho__c= '34';
+        
+        insert orditm2;
+
+        OrderItem orditm3 = new OrderItem();
+        orditm3.OrderId= ord3.Id;
+        orditm3.Product2Id = prod2.Id;
+        orditm3.PricebookEntryId =bookentry2.id;
+        orditm3.UnitPrice = 0;
+        orditm3.Quantity = 3;
+        orditm3.Tamanho__c= '34';
+        
+        insert orditm3;
+
+        b_InserirCompras n = new b_InserirCompras();
+        database.executeBatch(n);
+
+        Test.stopTest(); 
+    }
+
+}
