@@ -117,7 +117,7 @@ private class test_InserirCompras {
         insert orditm3;
 
         b_InserirCompras n = new b_InserirCompras();
-        database.executeBatch(n);
+        database.executeBatch(n,1);
 
         Test.stopTest(); 
     }
